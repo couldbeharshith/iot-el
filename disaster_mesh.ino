@@ -18,6 +18,17 @@
 #include "alert_manager.h"
 #include "hardware_manager.h"
 
+// Function declarations
+void updateUITask();
+void checkKeypadTask();
+void updateStatusTask();
+void handleKeyInput(char key);
+void handleHomeScreenInput(char key);
+void handleAlertCreateInput(char key);
+void handleAlertListInput(char key);
+void handleAlertDetailInput(char key);
+void handleStatusScreenInput(char key);
+
 // Global objects
 painlessMesh mesh;
 Scheduler taskScheduler;
@@ -98,7 +109,7 @@ void updateStatusTask() {
   // Update mesh status
   uint32_t nodeId = mesh.getNodeId();
   int nodeCount = mesh.getNodeList().size() + 1; // +1 for self
-  bool isRoot = (mesh.getNodeId() == mesh.getStationList().front());
+  bool isRoot = mesh.isRoot();
   
   uiManager.updateMeshStatus(nodeId, nodeCount, isRoot);
   

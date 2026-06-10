@@ -49,7 +49,7 @@ private:
   bool buzzerActive;
   
   // Keypad key mapping
-  const char keys[18] = "147*2580369#ABCDNF";
+  const char keys[19] = "147*2580369#ABCDNF";
 };
 
 #endif // HARDWARE_MANAGER_H
