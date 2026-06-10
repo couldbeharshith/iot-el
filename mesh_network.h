@@ -1,0 +1,33 @@
+/*
+ * Mesh Network Manager
+ * Handles painlessMesh initialization and message handling
+ */
+
+#ifndef MESH_NETWORK_H
+#define MESH_NETWORK_H
+
+#include <Arduino.h>
+#include <painlessMesh.h>
+#include "config.h"
+#include "alert_manager.h"
+
+// Forward declarations
+extern painlessMesh mesh;
+extern Scheduler taskScheduler;
+extern AlertManager alertManager;
+extern class HardwareManager hardwareManager;
+
+// Mesh initialization
+void initMesh();
+
+// Mesh callbacks
+void receivedCallback(uint32_t from, String &msg);
+void newConnectionCallback(uint32_t nodeId);
+void changedConnectionCallback();
+void nodeTimeAdjustedCallback(int32_t offset);
+
+// Mesh operations
+void sendAlertToMesh(const Alert& alert);
+void broadcastAlert(const Alert& alert);
+
+#endif // MESH_NETWORK_H
