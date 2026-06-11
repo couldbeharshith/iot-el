@@ -31,6 +31,12 @@ void UIManager::update() {
     return;
   }
   
+  // Always redraw alert creation screen for live potentiometer
+  // Always redraw home screen for live alert count
+  if (currentScreen == SCREEN_ALERT_CREATE || currentScreen == SCREEN_HOME) {
+    screenDirty = true;
+  }
+  
   // Only redraw if screen changed or needs update
   if (screenDirty) {
     switch (currentScreen) {
@@ -50,7 +56,10 @@ void UIManager::update() {
         showStatusScreen();
         break;
     }
-    screenDirty = false;
+    // Don't set screenDirty to false for screens that need continuous updates
+    if (currentScreen != SCREEN_ALERT_CREATE && currentScreen != SCREEN_HOME) {
+      screenDirty = false;
+    }
   }
   
   lastUpdate = now;
@@ -163,7 +172,7 @@ void UIManager::showHomeScreen() {
   // Footer with controls
   drawFooter("A:List B:Clear C:Sync D:Info");
   
-  screenDirty = false;
+  // Don't set screenDirty to false - handled in update()
 }
 
 void UIManager::showAlertCreateScreen() {
@@ -220,8 +229,7 @@ void UIManager::showAlertCreateScreen() {
   // Footer
   drawFooter("#:Confirm  *:Cancel");
   
-  // Force frequent updates for live severity
-  screenDirty = true;
+  // Don't set screenDirty to false - handled in update()
 }
 
 void UIManager::showAlertListScreen() {
