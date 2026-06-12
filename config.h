@@ -13,6 +13,10 @@
 #define MESH_PASSWORD   "DisasterNet2024"
 #define MESH_PORT       5555
 
+// ===== ROOT NODE CONFIGURATION =====
+// Set to 1 to designate this node as ROOT (gateway), 0 for child node
+#define IS_ROOT_NODE    0  // Change to 1 for root node
+
 // ===== PIN DEFINITIONS =====
 #define PIN_BUZZER      25
 #define PIN_NEOPIXEL    17

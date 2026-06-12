@@ -45,6 +45,12 @@ void setup() {
   Serial.begin(115200);
   Serial.println("\n\n=== Disaster Management Mesh Network ===");
   
+  #if IS_ROOT_NODE == 1
+    Serial.println(">>> ROOT NODE MODE <<<");
+  #else
+    Serial.println(">>> CHILD NODE MODE <<<");
+  #endif
+  
   // Initialize hardware
   hardwareManager.begin();
   Serial.println("[✓] Hardware initialized");
@@ -106,13 +112,12 @@ void checkKeypadTask() {
 
 // Task: Update status information
 void updateStatusTask() {
-  // Refresh root info every cycle
-  refreshRootInfo();
+  // Use hardcoded root flag from config.h
+  bool isRoot = (IS_ROOT_NODE == 1);
   
   // Update mesh status
   uint32_t nodeId = mesh.getNodeId();
   int nodeCount = mesh.getNodeList().size() + 1; // +1 for self
-  bool isRoot = cachedIsRoot;
   
   uiManager.updateMeshStatus(nodeId, nodeCount, isRoot);
   
