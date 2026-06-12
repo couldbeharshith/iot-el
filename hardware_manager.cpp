@@ -31,7 +31,7 @@ void HardwareManager::begin() {
   
   // Initialize NeoPixel
   neopixel.begin();
-  neopixel.setBrightness(100);
+  neopixel.setBrightness(100);  // 0-255 range
   neopixel.clear();
   neopixel.show();
   Serial.println("NeoPixel initialized");
@@ -50,6 +50,15 @@ void HardwareManager::begin() {
     }
     Serial.println("RTC initialized");
   }
+  
+  // Startup animation - quick rainbow
+  setStatusLED(255, 0, 0);
+  delay(100);
+  setStatusLED(0, 255, 0);
+  delay(100);
+  setStatusLED(0, 0, 255);
+  delay(100);
+  setStatusLED(0, 0, 0);
   
   // Test beep
   playShortBeep();

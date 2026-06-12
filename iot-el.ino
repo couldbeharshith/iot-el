@@ -113,13 +113,36 @@ void updateStatusTask() {
   
   uiManager.updateMeshStatus(nodeId, nodeCount, isRoot);
   
-  // Update NeoPixel based on mesh status
-  if (isRoot) {
-    hardwareManager.setStatusLED(0, 0, 255); // Blue for root
-  } else if (nodeCount > 1) {
-    hardwareManager.setStatusLED(0, 255, 0); // Green for connected
+  // Update NeoPixel based on priority: alerts > mesh status
+  int activeAlerts = alertManager.getActiveAlertCount();
+  
+  if (activeAlerts > 0) {
+    // Get highest severity alert
+    int highestSeverity = 0;
+    for (int i = 0; i < alertManager.getAlertCount(); i++) {
+      Alert alert = alertManager.getAlert(i);
+      if (alert.status == ALERT_ACTIVE && alert.severity > highestSeverity) {
+        highestSeverity = alert.severity;
+      }
+    }
+    
+    // Show alert severity color
+    if (highestSeverity > 66) {
+      hardwareManager.setStatusLED(255, 0, 0); // Red for high severity
+    } else if (highestSeverity > 33) {
+      hardwareManager.setStatusLED(255, 165, 0); // Orange for medium severity
+    } else {
+      hardwareManager.setStatusLED(255, 255, 0); // Yellow for low severity
+    }
   } else {
-    hardwareManager.setStatusLED(255, 165, 0); // Orange for searching
+    // No alerts - show mesh status
+    if (isRoot) {
+      hardwareManager.setStatusLED(0, 0, 255); // Blue for root
+    } else if (nodeCount > 1) {
+      hardwareManager.setStatusLED(0, 255, 0); // Green for connected
+    } else {
+      hardwareManager.setStatusLED(255, 165, 0); // Orange for searching
+    }
   }
 }
 
