@@ -29,5 +29,6 @@ void nodeTimeAdjustedCallback(int32_t offset);
 // Mesh operations
 void sendAlertToMesh(const Alert& alert);
 void broadcastAlert(const Alert& alert);
+void broadcastResolve(uint32_t alertId);
 
 #endif // MESH_NETWORK_H

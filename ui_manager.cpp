@@ -26,9 +26,23 @@ void UIManager::begin() {
 void UIManager::update() {
   unsigned long now = millis();
   
+  // Different throttle times for different screens
+  unsigned long throttleTime = 100;  // Default
+  
+  if (currentScreen == SCREEN_HOME) {
+    throttleTime = 3000;  // 3 seconds for home screen
+  } else if (currentScreen == SCREEN_ALERT_CREATE) {
+    throttleTime = 500;  // 500ms for alert creation (live potentiometer)
+  }
+  
   // Throttle updates to avoid flickering
-  if (now - lastUpdate < 100) {
+  if (now - lastUpdate < throttleTime) {
     return;
+  }
+  
+  // Force refresh for screens that need live updates
+  if (currentScreen == SCREEN_HOME || currentScreen == SCREEN_ALERT_CREATE) {
+    screenDirty = true;
   }
   
   // Only redraw if screen changed or needs update
@@ -219,9 +233,6 @@ void UIManager::showAlertCreateScreen() {
   
   // Footer
   drawFooter("#:Confirm  *:Cancel");
-  
-  // Force frequent updates for live severity
-  screenDirty = true;
 }
 
 void UIManager::showAlertListScreen() {

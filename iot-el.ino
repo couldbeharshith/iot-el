@@ -225,7 +225,21 @@ void handleAlertListInput(char key) {
   } else if (key == 'B') {
     // Resolve current alert
     int currentIndex = uiManager.getCurrentAlertIndex();
-    alertManager.resolveAlert(currentIndex);
+    Alert* alertPtr = alertManager.getAlertPointer(currentIndex);
+    
+    if (alertPtr != nullptr && alertPtr->status == ALERT_ACTIVE) {
+      uint32_t alertId = alertPtr->alertId;
+      
+      // Resolve locally
+      alertManager.resolveAlert(currentIndex);
+      
+      // Broadcast resolve to mesh network
+      broadcastResolve(alertId);
+      
+      Serial.print("Alert resolved and broadcasted: ID ");
+      Serial.println(alertId);
+    }
+    
     uiManager.setScreen(SCREEN_HOME);
     
   } else if (key == 'D') {

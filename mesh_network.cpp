@@ -5,6 +5,7 @@
 #include "mesh_network.h"
 #include "hardware_manager.h"
 #include "ui_manager.h"
+#include <ArduinoJson.h>
 
 extern UIManager uiManager;
 
@@ -32,7 +33,27 @@ void receivedCallback(uint32_t from, String &msg) {
   Serial.print(" - ");
   Serial.println(msg);
   
-  // Parse the alert from JSON
+  // Parse JSON to check message type
+  StaticJsonDocument<256> doc;
+  deserializeJson(doc, msg);
+  
+  // Check if it's a resolve message
+  if (doc.containsKey("resolve")) {
+    uint32_t alertId = doc["resolve"];
+    Serial.print("Resolve message received for alert ID: ");
+    Serial.println(alertId);
+    
+    // Find and resolve the alert locally
+    bool resolved = alertManager.resolveAlertById(alertId);
+    
+    if (resolved) {
+      Serial.println("Alert resolved successfully");
+      hardwareManager.playShortBeep();
+    }
+    return;
+  }
+  
+  // Otherwise, it's an alert message
   Alert receivedAlert = alertManager.jsonToAlert(msg);
   
   // Check if alert already exists (to prevent duplicates)
@@ -41,6 +62,11 @@ void receivedCallback(uint32_t from, String &msg) {
     Alert existing = alertManager.getAlert(i);
     if (existing.alertId == receivedAlert.alertId) {
       exists = true;
+      // Update the status if it changed
+      if (existing.status != receivedAlert.status) {
+        alertManager.resolveAlertById(receivedAlert.alertId);
+        Serial.println("Alert status updated");
+      }
       break;
     }
   }
@@ -93,4 +119,19 @@ void sendAlertToMesh(const Alert& alert) {
 
 void broadcastAlert(const Alert& alert) {
   sendAlertToMesh(alert);
+}
+
+void broadcastResolve(uint32_t alertId) {
+  // Create a resolve message
+  StaticJsonDocument<128> doc;
+  doc["resolve"] = alertId;
+  
+  String json;
+  serializeJson(doc, json);
+  
+  // Broadcast to all nodes
+  mesh.sendBroadcast(json);
+  
+  Serial.print("Resolve broadcast to mesh for alert ID: ");
+  Serial.println(alertId);
 }
