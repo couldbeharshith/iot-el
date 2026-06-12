@@ -75,6 +75,11 @@ void UIManager::update() {
 }
 
 void UIManager::setScreen(UIScreen screen) {
+  Serial.print("setScreen called: current=");
+  Serial.print(currentScreen);
+  Serial.print(", new=");
+  Serial.println(screen);
+  
   if (currentScreen != screen) {
     previousScreen = currentScreen;
     currentScreen = screen;
@@ -82,6 +87,8 @@ void UIManager::setScreen(UIScreen screen) {
     currentAlertIndex = 0; // Reset navigation
     Serial.print("Screen changed to: ");
     Serial.println(screen);
+  } else {
+    Serial.println("Screen already set to this value");
   }
 }
 

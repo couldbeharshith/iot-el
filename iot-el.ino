@@ -244,8 +244,12 @@ void handleAlertDetailInput(char key) {
 
 // Status screen input handler
 void handleStatusScreenInput(char key) {
+  Serial.print("Status screen key: ");
+  Serial.println(key);
+  
   if (key == 'D' || key == '*') {
     // Back to home
+    Serial.println("Going back to home from status");
     uiManager.setScreen(SCREEN_HOME);
   }
 }
