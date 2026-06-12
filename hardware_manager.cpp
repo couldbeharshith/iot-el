@@ -22,9 +22,9 @@ void HardwareManager::begin() {
     Serial.println("Keypad initialized");
   }
   
-  // Initialize buzzer
+  // Initialize buzzer (active-low logic: HIGH = OFF, LOW = ON)
   pinMode(buzzerPin, OUTPUT);
-  digitalWrite(buzzerPin, LOW);  // Ensure buzzer starts LOW
+  digitalWrite(buzzerPin, HIGH);  // Ensure buzzer starts HIGH (OFF for active-low)
   ledcSetup(BUZZER_CHANNEL, BUZZER_FREQ, BUZZER_RESOLUTION);
   ledcWriteTone(BUZZER_CHANNEL, 0); // Ensure buzzer is off initially
   Serial.println("Buzzer initialized");
@@ -90,7 +90,7 @@ void HardwareManager::stopTone() {
   ledcWriteTone(BUZZER_CHANNEL, 0);
   ledcDetachPin(buzzerPin);  // Detach pin to fully stop buzzer
   pinMode(buzzerPin, OUTPUT);
-  digitalWrite(buzzerPin, LOW);  // Ensure pin is LOW
+  digitalWrite(buzzerPin, HIGH);  // Ensure pin is HIGH (OFF for active-low)
   buzzerActive = false;
 }
 
