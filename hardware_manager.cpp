@@ -26,6 +26,7 @@ void HardwareManager::begin() {
   pinMode(buzzerPin, OUTPUT);
   ledcSetup(BUZZER_CHANNEL, BUZZER_FREQ, BUZZER_RESOLUTION);
   ledcAttachPin(buzzerPin, BUZZER_CHANNEL);
+  ledcWriteTone(BUZZER_CHANNEL, 0); // Ensure buzzer is off initially
   Serial.println("Buzzer initialized");
   
   // Initialize NeoPixel

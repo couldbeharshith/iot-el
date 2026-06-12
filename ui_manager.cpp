@@ -26,8 +26,17 @@ void UIManager::begin() {
 void UIManager::update() {
   unsigned long now = millis();
   
+  // Different throttle times for different screens
+  unsigned long throttleTime = 100;  // Default
+  
+  if (currentScreen == SCREEN_HOME) {
+    throttleTime = HOME_REFRESH_INTERVAL;
+  } else if (currentScreen == SCREEN_ALERT_CREATE) {
+    throttleTime = ALERT_CREATE_REFRESH_INTERVAL;
+  }
+  
   // Throttle updates to avoid flickering
-  if (now - lastUpdate < 100) {
+  if (now - lastUpdate < throttleTime) {
     return;
   }
   

@@ -67,6 +67,8 @@ enum AlertStatus {
 
 // ===== UI SETTINGS =====
 #define SCREEN_TIMEOUT  30000  // 30 seconds
+#define HOME_REFRESH_INTERVAL 3000  // 3 seconds for home screen refresh
+#define ALERT_CREATE_REFRESH_INTERVAL 500  // 0.5 seconds for alert creation (faster for pot)
 
 // Screen types
 enum UIScreen {
