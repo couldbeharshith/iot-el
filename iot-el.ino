@@ -106,14 +106,12 @@ void checkKeypadTask() {
 
 // Task: Update status information
 void updateStatusTask() {
+  // Refresh root info every cycle
+  refreshRootInfo();
+  
   // Update mesh status
   uint32_t nodeId = mesh.getNodeId();
   int nodeCount = mesh.getNodeList().size() + 1; // +1 for self
-  
-  // Update cached root status
-  cachedRootNodeId = getRootNodeId();
-  cachedIsRoot = isRootNode();
-  
   bool isRoot = cachedIsRoot;
   
   uiManager.updateMeshStatus(nodeId, nodeCount, isRoot);

@@ -37,8 +37,7 @@ void broadcastResolve(uint32_t alertId);
 
 // Root node detection
 bool findRoot(const painlessmesh::protocol::NodeTree& tree, uint32_t& rootId);
-bool isRootNode();
-uint32_t getRootNodeId();
+void refreshRootInfo();
 
 // Sync operations
 void requestSync();

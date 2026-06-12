@@ -47,24 +47,21 @@ bool findRoot(const painlessmesh::protocol::NodeTree& tree, uint32_t& rootId) {
   return false;
 }
 
-bool isRootNode() {
+void refreshRootInfo() {
   auto tree = mesh.asNodeTree();
   
   uint32_t rootId = 0;
-  if (!findRoot(tree, rootId)) {
-    return false;
-  }
+  bool found = findRoot(tree, rootId);
   
-  return rootId == mesh.getNodeId();
-}
-
-uint32_t getRootNodeId() {
-  auto tree = mesh.asNodeTree();
+  cachedRootNodeId = found ? rootId : 0;
+  cachedIsRoot = found && (rootId == mesh.getNodeId());
   
-  uint32_t rootId = 0;
-  findRoot(tree, rootId);
-  
-  return rootId;
+  Serial.print("Root check: found=");
+  Serial.print(found);
+  Serial.print(", rootId=");
+  Serial.print(cachedRootNodeId, HEX);
+  Serial.print(", isRoot=");
+  Serial.println(cachedIsRoot);
 }
 
 void receivedCallback(uint32_t from, String &msg) {
@@ -159,15 +156,14 @@ void changedConnectionCallback() {
   Serial.print("Connected nodes: ");
   Serial.println(mesh.getNodeList().size());
   
-  // Update cached root node info
-  cachedRootNodeId = getRootNodeId();
-  cachedIsRoot = isRootNode();
+  // Refresh root node info
+  refreshRootInfo();
   
   if (cachedIsRoot) {
-    Serial.println("I am ROOT");
+    Serial.println(">>> I am ROOT <<<");
   } else {
     Serial.print("Root node is: ");
-    Serial.println(cachedRootNodeId);
+    Serial.println(cachedRootNodeId, HEX);
   }
 }
 
