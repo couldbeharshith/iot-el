@@ -24,8 +24,8 @@ void HardwareManager::begin() {
   
   // Initialize buzzer
   pinMode(buzzerPin, OUTPUT);
+  digitalWrite(buzzerPin, LOW);  // Ensure buzzer starts LOW
   ledcSetup(BUZZER_CHANNEL, BUZZER_FREQ, BUZZER_RESOLUTION);
-  ledcAttachPin(buzzerPin, BUZZER_CHANNEL);
   ledcWriteTone(BUZZER_CHANNEL, 0); // Ensure buzzer is off initially
   Serial.println("Buzzer initialized");
   
@@ -68,6 +68,7 @@ int HardwareManager::readSeverity() {
 }
 
 void HardwareManager::playTone(int frequency, int duration) {
+  ledcAttachPin(buzzerPin, BUZZER_CHANNEL);  // Re-attach pin before playing
   ledcWriteTone(BUZZER_CHANNEL, frequency);
   buzzerActive = true;
   delay(duration);
@@ -87,6 +88,9 @@ void HardwareManager::playAlertBeep() {
 
 void HardwareManager::stopTone() {
   ledcWriteTone(BUZZER_CHANNEL, 0);
+  ledcDetachPin(buzzerPin);  // Detach pin to fully stop buzzer
+  pinMode(buzzerPin, OUTPUT);
+  digitalWrite(buzzerPin, LOW);  // Ensure pin is LOW
   buzzerActive = false;
 }
 
