@@ -109,7 +109,7 @@ void updateStatusTask() {
   // Update mesh status
   uint32_t nodeId = mesh.getNodeId();
   int nodeCount = mesh.getNodeList().size() + 1; // +1 for self
-  bool isRoot = mesh.isRoot();
+  bool isRoot = isRootNode();
   
   uiManager.updateMeshStatus(nodeId, nodeCount, isRoot);
   
@@ -193,9 +193,8 @@ void handleHomeScreenInput(char key) {
     uiManager.setScreen(SCREEN_ALERT_LIST);
     
   } else if (key == 'C') {
-    // Refresh/sync
-    hardwareManager.playShortBeep();
-    hardwareManager.playShortBeep();
+    // Refresh/sync - request all alerts from network
+    requestSync();
     Serial.println("Manual sync requested");
     
   } else if (key == 'D') {

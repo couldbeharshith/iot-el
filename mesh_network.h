@@ -31,4 +31,14 @@ void sendAlertToMesh(const Alert& alert);
 void broadcastAlert(const Alert& alert);
 void broadcastResolve(uint32_t alertId);
 
+// Root node detection
+bool findRoot(const painlessmesh::protocol::NodeTree& tree, uint32_t& rootId);
+bool isRootNode();
+uint32_t getRootNodeId();
+
+// Sync operations
+void requestSync();
+void broadcastSyncRequest();
+void sendSyncResponse(uint32_t targetNode);
+
 #endif // MESH_NETWORK_H

@@ -9,6 +9,10 @@
 
 extern UIManager uiManager;
 
+// Cache root node ID
+uint32_t cachedRootNodeId = 0;
+bool cachedIsRoot = false;
+
 void initMesh() {
   // Set debug output
   mesh.setDebugMsgTypes(ERROR | STARTUP);
@@ -27,6 +31,42 @@ void initMesh() {
   Serial.println(mesh.getNodeId());
 }
 
+// Root node detection functions
+bool findRoot(const painlessmesh::protocol::NodeTree& tree, uint32_t& rootId) {
+  if (tree.root) {
+    rootId = tree.nodeId;
+    return true;
+  }
+  
+  for (const auto& child : tree.subs) {
+    if (findRoot(child, rootId)) {
+      return true;
+    }
+  }
+  
+  return false;
+}
+
+bool isRootNode() {
+  auto tree = mesh.asNodeTree();
+  
+  uint32_t rootId = 0;
+  if (!findRoot(tree, rootId)) {
+    return false;
+  }
+  
+  return rootId == mesh.getNodeId();
+}
+
+uint32_t getRootNodeId() {
+  auto tree = mesh.asNodeTree();
+  
+  uint32_t rootId = 0;
+  findRoot(tree, rootId);
+  
+  return rootId;
+}
+
 void receivedCallback(uint32_t from, String &msg) {
   Serial.print("Received message from: ");
   Serial.print(from);
@@ -36,6 +76,25 @@ void receivedCallback(uint32_t from, String &msg) {
   // Parse JSON to check message type
   StaticJsonDocument<256> doc;
   deserializeJson(doc, msg);
+  
+  // Check message type
+  if (doc.containsKey("type")) {
+    String msgType = doc["type"].as<String>();
+    
+    // Handle sync request
+    if (msgType == "sync_req") {
+      Serial.println("Sync request received, sending all alerts");
+      sendSyncResponse(from);
+      return;
+    }
+    
+    // Handle sync response
+    if (msgType == "sync_resp") {
+      Serial.println("Sync response received");
+      hardwareManager.playShortBeep();
+      return;
+    }
+  }
   
   // Check if it's a resolve message
   if (doc.containsKey("resolve")) {
@@ -99,6 +158,17 @@ void changedConnectionCallback() {
   Serial.println("Connections changed");
   Serial.print("Connected nodes: ");
   Serial.println(mesh.getNodeList().size());
+  
+  // Update cached root node info
+  cachedRootNodeId = getRootNodeId();
+  cachedIsRoot = isRootNode();
+  
+  if (cachedIsRoot) {
+    Serial.println("I am ROOT");
+  } else {
+    Serial.print("Root node is: ");
+    Serial.println(cachedRootNodeId);
+  }
 }
 
 void nodeTimeAdjustedCallback(int32_t offset) {
@@ -134,4 +204,52 @@ void broadcastResolve(uint32_t alertId) {
   
   Serial.print("Resolve broadcast to mesh for alert ID: ");
   Serial.println(alertId);
+}
+
+// Sync functions
+void requestSync() {
+  broadcastSyncRequest();
+  
+  Serial.println("Sync request sent to all nodes");
+  hardwareManager.playShortBeep();
+  hardwareManager.playShortBeep();
+}
+
+void broadcastSyncRequest() {
+  StaticJsonDocument<64> doc;
+  doc["type"] = "sync_req";
+  doc["from"] = mesh.getNodeId();
+  
+  String json;
+  serializeJson(doc, json);
+  
+  mesh.sendBroadcast(json);
+  Serial.println("Sync request broadcast");
+}
+
+void sendSyncResponse(uint32_t targetNode) {
+  // Send all active alerts to requesting node
+  int alertCount = alertManager.getAlertCount();
+  
+  Serial.print("Sending ");
+  Serial.print(alertCount);
+  Serial.println(" alerts as sync response");
+  
+  for (int i = 0; i < alertCount; i++) {
+    Alert alert = alertManager.getAlert(i);
+    String json = alertManager.alertToJson(alert);
+    
+    // Send to specific node
+    mesh.sendSingle(targetNode, json);
+    delay(50); // Small delay between messages
+  }
+  
+  // Send sync complete message
+  StaticJsonDocument<64> doc;
+  doc["type"] = "sync_resp";
+  doc["count"] = alertCount;
+  
+  String json;
+  serializeJson(doc, json);
+  mesh.sendSingle(targetNode, json);
 }
