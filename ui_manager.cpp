@@ -26,24 +26,9 @@ void UIManager::begin() {
 void UIManager::update() {
   unsigned long now = millis();
   
-  // Different throttle times for different screens
-  unsigned long throttleTime = 100;  // Default
-  
-  if (currentScreen == SCREEN_HOME) {
-    throttleTime = HOME_REFRESH_INTERVAL;
-  } else if (currentScreen == SCREEN_ALERT_CREATE) {
-    throttleTime = ALERT_CREATE_REFRESH_INTERVAL;
-  }
-  
-  // Throttle updates to avoid flickering, but skip throttling if screen changed
-  if (!screenDirty && (now - lastUpdate < throttleTime)) {
+  // Throttle updates to avoid flickering
+  if (now - lastUpdate < 100) {
     return;
-  }
-  
-  // Always redraw alert creation screen for live potentiometer
-  // Always redraw home screen for live alert count
-  if (currentScreen == SCREEN_ALERT_CREATE || currentScreen == SCREEN_HOME) {
-    screenDirty = true;
   }
   
   // Only redraw if screen changed or needs update
@@ -65,21 +50,13 @@ void UIManager::update() {
         showStatusScreen();
         break;
     }
-    // Don't set screenDirty to false for screens that need continuous updates
-    if (currentScreen != SCREEN_ALERT_CREATE && currentScreen != SCREEN_HOME) {
-      screenDirty = false;
-    }
+    screenDirty = false;
   }
   
   lastUpdate = now;
 }
 
 void UIManager::setScreen(UIScreen screen) {
-  Serial.print("setScreen called: current=");
-  Serial.print(currentScreen);
-  Serial.print(", new=");
-  Serial.println(screen);
-  
   if (currentScreen != screen) {
     previousScreen = currentScreen;
     currentScreen = screen;
@@ -87,8 +64,6 @@ void UIManager::setScreen(UIScreen screen) {
     currentAlertIndex = 0; // Reset navigation
     Serial.print("Screen changed to: ");
     Serial.println(screen);
-  } else {
-    Serial.println("Screen already set to this value");
   }
 }
 
@@ -188,7 +163,7 @@ void UIManager::showHomeScreen() {
   // Footer with controls
   drawFooter("A:List B:Clear C:Sync D:Info");
   
-  // Don't set screenDirty to false - handled in update()
+  screenDirty = false;
 }
 
 void UIManager::showAlertCreateScreen() {
@@ -245,7 +220,8 @@ void UIManager::showAlertCreateScreen() {
   // Footer
   drawFooter("#:Confirm  *:Cancel");
   
-  // Don't set screenDirty to false - handled in update()
+  // Force frequent updates for live severity
+  screenDirty = true;
 }
 
 void UIManager::showAlertListScreen() {
