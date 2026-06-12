@@ -109,7 +109,12 @@ void updateStatusTask() {
   // Update mesh status
   uint32_t nodeId = mesh.getNodeId();
   int nodeCount = mesh.getNodeList().size() + 1; // +1 for self
-  bool isRoot = isRootNode();
+  
+  // Update cached root status
+  cachedRootNodeId = getRootNodeId();
+  cachedIsRoot = isRootNode();
+  
+  bool isRoot = cachedIsRoot;
   
   uiManager.updateMeshStatus(nodeId, nodeCount, isRoot);
   

@@ -17,6 +17,10 @@ extern Scheduler taskScheduler;
 extern AlertManager alertManager;
 extern class HardwareManager hardwareManager;
 
+// Cache root node status (updated every 2 seconds in updateStatusTask)
+extern uint32_t cachedRootNodeId;
+extern bool cachedIsRoot;
+
 // Mesh initialization
 void initMesh();
 
