@@ -35,8 +35,8 @@ void UIManager::update() {
     throttleTime = ALERT_CREATE_REFRESH_INTERVAL;
   }
   
-  // Throttle updates to avoid flickering
-  if (now - lastUpdate < throttleTime) {
+  // Throttle updates to avoid flickering, but skip throttling if screen changed
+  if (!screenDirty && (now - lastUpdate < throttleTime)) {
     return;
   }
   
