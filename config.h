@@ -19,7 +19,7 @@
 
 // ===== WIFI SETTINGS (ROOT NODE ONLY) =====
 #define WIFI_SSID       "Batman_"
-#define WIFI_PASSWORD   "123456789"
+#define WIFI_PASSWORD   "1234567890"
 
 // ===== MQTT HIVEMQ CLOUD SETTINGS (ROOT NODE ONLY) =====
 #define MQTT_BROKER     "a2d174684b10434db4fed867424bf8e6.s1.eu.hivemq.cloud"
