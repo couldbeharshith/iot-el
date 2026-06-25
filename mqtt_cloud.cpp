@@ -5,12 +5,10 @@
 #include "mqtt_cloud.h"
 #include <ArduinoJson.h>
 
-// Forward declare mesh if needed
 #if IS_ROOT_NODE == 1
-  #include <painlessMesh.h>
+  #include "mesh_network.h"
+  extern painlessMesh mesh;
 #endif
-
-extern painlessMesh mesh;
 
 #if IS_ROOT_NODE == 1
 
