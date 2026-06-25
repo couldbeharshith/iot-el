@@ -5,9 +5,11 @@
 #include "mesh_network.h"
 #include "hardware_manager.h"
 #include "ui_manager.h"
+#include "mqtt_cloud.h"
 #include <ArduinoJson.h>
 
 extern UIManager uiManager;
+extern MQTTCloud mqttCloud;
 
 // Cache root node ID
 uint32_t cachedRootNodeId = 0;
@@ -130,6 +132,9 @@ void receivedCallback(uint32_t from, String &msg) {
   if (!exists) {
     // Add to local alert list
     alertManager.addAlert(receivedAlert);
+    
+    // Publish to MQTT cloud (root node forwards all alerts)
+    mqttCloud.publishAlert(receivedAlert);
     
     // Play alert sound
     hardwareManager.playAlertBeep();

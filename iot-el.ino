@@ -17,6 +17,7 @@
 #include "ui_manager.h"
 #include "alert_manager.h"
 #include "hardware_manager.h"
+#include "mqtt_cloud.h"
 
 // Function declarations
 void updateUITask();
@@ -35,6 +36,7 @@ Scheduler taskScheduler;
 UIManager uiManager;
 AlertManager alertManager;
 HardwareManager hardwareManager;
+MQTTCloud mqttCloud;
 
 // Tasks
 Task taskUpdateUI(TASK_MILLISECOND * 100, TASK_FOREVER, &updateUITask);
@@ -69,6 +71,10 @@ void setup() {
   initMesh();
   Serial.println("[✓] Mesh network initialized");
   
+  // Initialize MQTT cloud (root node only)
+  mqttCloud.begin();
+  Serial.println("[✓] MQTT cloud initialized");
+  
   // Add tasks
   taskScheduler.addTask(taskUpdateUI);
   taskScheduler.addTask(taskCheckKeypad);
@@ -86,6 +92,7 @@ void setup() {
 
 void loop() {
   mesh.update();
+  mqttCloud.loop();
   taskScheduler.execute();
 }
 
@@ -224,6 +231,9 @@ void handleAlertCreateInput(char key) {
     // Send to mesh network
     sendAlertToMesh(newAlert);
     
+    // Publish to MQTT cloud (root node only)
+    mqttCloud.publishAlert(newAlert);
+    
     // Play confirmation
     hardwareManager.playShortBeep();
     delay(100);
@@ -265,6 +275,9 @@ void handleAlertListInput(char key) {
       
       // Broadcast resolve to mesh network
       broadcastResolve(alertId);
+      
+      // Publish resolve to MQTT cloud (root node only)
+      mqttCloud.publishResolve(alertId);
       
       Serial.print("Alert resolved and broadcasted: ID ");
       Serial.println(alertId);

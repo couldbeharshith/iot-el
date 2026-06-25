@@ -17,6 +17,17 @@
 // Set to 1 to designate this node as ROOT (gateway), 0 for child node
 #define IS_ROOT_NODE    0  // Change to 1 for root node
 
+// ===== WIFI SETTINGS (ROOT NODE ONLY) =====
+#define WIFI_SSID       "Batman_"
+#define WIFI_PASSWORD   "123456789"
+
+// ===== MQTT HIVEMQ CLOUD SETTINGS (ROOT NODE ONLY) =====
+#define MQTT_BROKER     "a2d174684b10434db4fed867424bf8e6.s1.eu.hivemq.cloud"
+#define MQTT_PORT       8883
+#define MQTT_USER       "rvceIOT"
+#define MQTT_PASSWORD   "rvceIOT4"
+#define MQTT_TOPIC      "disaster/alerts"
+
 // ===== PIN DEFINITIONS =====
 #define PIN_BUZZER      25
 #define PIN_NEOPIXEL    17
