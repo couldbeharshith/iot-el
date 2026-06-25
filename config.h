@@ -15,7 +15,7 @@
 
 // ===== ROOT NODE CONFIGURATION =====
 // Set to 1 to designate this node as ROOT (gateway), 0 for child node
-#define IS_ROOT_NODE    0  // Change to 1 for root node
+#define IS_ROOT_NODE    1  // Change to 1 for root node
 
 // ===== WIFI SETTINGS (ROOT NODE ONLY) =====
 #define WIFI_SSID       "Ananya"

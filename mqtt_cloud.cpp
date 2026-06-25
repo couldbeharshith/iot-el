@@ -6,11 +6,6 @@
 #include <ArduinoJson.h>
 
 #if IS_ROOT_NODE == 1
-  #include "mesh_network.h"
-  extern painlessMesh mesh;
-#endif
-
-#if IS_ROOT_NODE == 1
 
 MQTTCloud::MQTTCloud() 
   : mqttClient(wifiClient), lastReconnect(0) {
@@ -61,7 +56,7 @@ void MQTTCloud::reconnectMQTT() {
   }
   
   Serial.print("MQTT connecting to HiveMQ...");
-  String clientId = "ESP32-" + String(mesh.getNodeId(), HEX);
+  String clientId = "DisasterMesh-" + String(random(0xFFFF), HEX);
   
   if (mqttClient.connect(clientId.c_str(), MQTT_USER, MQTT_PASSWORD)) {
     Serial.println("Connected!");
