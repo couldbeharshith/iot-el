@@ -3,7 +3,10 @@
  */
 
 #include "mqtt_cloud.h"
+#include "mesh_network.h"
 #include <ArduinoJson.h>
+
+extern painlessMesh mesh;
 
 #if IS_ROOT_NODE == 1
 

@@ -8,17 +8,13 @@
 
 #include <Arduino.h>
 #include "config.h"
+#include "alert_manager.h"
 
 #if IS_ROOT_NODE == 1
   #include <WiFi.h>
   #include <WiFiClientSecure.h>
   #include <PubSubClient.h>
 #endif
-
-#include "alert_manager.h"
-
-extern AlertManager alertManager;
-extern painlessMesh mesh;
 
 class MQTTCloud {
 public:
