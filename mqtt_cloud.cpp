@@ -4,8 +4,11 @@
 
 #include "mqtt_cloud.h"
 #include <ArduinoJson.h>
+#include <painlessMesh.h>
 
 #if IS_ROOT_NODE == 1
+
+extern painlessMesh mesh;
 
 MQTTCloud::MQTTCloud() 
   : mqttClient(wifiClient), lastReconnect(0) {
@@ -28,31 +31,30 @@ void MQTTCloud::begin() {
 }
 
 void MQTTCloud::connectWiFi() {
-  Serial.print("WiFi connecting to: ");
+  Serial.print("WiFi connecting in background to: ");
   Serial.println(WIFI_SSID);
   
-  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-  
-  int attempts = 0;
-  while (WiFi.status() != WL_CONNECTED && attempts < 20) {
-    delay(500);
-    Serial.print(".");
-    attempts++;
-  }
-  
-  if (WiFi.status() == WL_CONNECTED) {
-    Serial.println("\nWiFi connected!");
-    Serial.print("IP: ");
-    Serial.println(WiFi.localIP());
-  } else {
-    Serial.println("\nWiFi FAILED!");
-  }
+  // Use painlessMesh's built-in station manual connection to avoid Wi-Fi channel conflicts
+  mesh.stationManual(WIFI_SSID, WIFI_PASSWORD);
 }
 
 void MQTTCloud::reconnectMQTT() {
+  static bool wifiWasConnected = false;
+  
   if (WiFi.status() != WL_CONNECTED) {
+    if (wifiWasConnected) {
+      Serial.println("WiFi disconnected!");
+      wifiWasConnected = false;
+    }
     Serial.println("WiFi down, skipping MQTT");
     return;
+  }
+  
+  if (!wifiWasConnected) {
+    Serial.println("\n[✓] WiFi connected in background!");
+    Serial.print("IP: ");
+    Serial.println(WiFi.localIP());
+    wifiWasConnected = true;
   }
   
   Serial.print("MQTT connecting to HiveMQ...");

@@ -107,6 +107,9 @@ void receivedCallback(uint32_t from, String &msg) {
     if (resolved) {
       Serial.println("Alert resolved successfully");
       hardwareManager.playShortBeep();
+      
+      // Publish the resolve to the MQTT cloud (root node only)
+      mqttCloud.publishResolve(alertId);
     }
     return;
   }
